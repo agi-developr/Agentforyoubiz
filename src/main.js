@@ -340,3 +340,131 @@ if (connectBtn) {
     }, 1500);
   });
 }
+
+// 4. Business Pipelines View
+const bizPipelinesBtn = document.getElementById('bizPipelinesBtn');
+const pipelineContainer = document.querySelector('.pipeline-container');
+
+function renderBusinessPipelines() {
+  pipelineContainer.innerHTML = `
+    <h1 class="title">Business Pipelines</h1>
+    <div class="pipeline-grid">
+      
+      <div class="biz-card">
+        <div class="icon-large">📈</div>
+        <h3>Marketing</h3>
+        <p>Brand awareness, campaigns, lead generation</p>
+      </div>
+
+      <div class="biz-card">
+        <div class="icon-large">🏭</div>
+        <h3>Manufacturing</h3>
+        <p>Production, supply chain, quality control</p>
+      </div>
+
+      <div class="biz-card">
+        <div class="icon-large">⚖️</div>
+        <h3>Compliance</h3>
+        <p>Legal, regulations, audits, certifications</p>
+      </div>
+
+      <div class="biz-card">
+        <div class="icon-large">💰</div>
+        <h3>Sales</h3>
+        <p>Pipeline management, CRM, revenue tracking</p>
+      </div>
+
+      <div class="biz-card">
+        <div class="icon-large">👥</div>
+        <h3>HR</h3>
+        <p>Recruiting, onboarding, performance, payroll</p>
+      </div>
+
+      <div class="biz-card">
+        <div class="icon-large">⚙️</div>
+        <h3>Operations</h3>
+        <p>Infrastructure, logistics, processes</p>
+      </div>
+
+      <div class="biz-card">
+        <div class="icon-large">💼</div>
+        <h3>Finance</h3>
+        <p>Accounting, budgeting, forecasting, reporting</p>
+      </div>
+
+      <div class="biz-card">
+        <div class="icon-large">🎨</div>
+        <h3>Product</h3>
+        <p>Design, development, roadmap, launches</p>
+      </div>
+
+      <div class="biz-card">
+        <div class="icon-large">🤝</div>
+        <h3>Customer Success</h3>
+        <p>Support, retention, satisfaction, feedback</p>
+      </div>
+
+    </div>
+  `;
+}
+
+function renderIntegrationPipeline() {
+  pipelineContainer.innerHTML = `
+    <h1 class="title">Integration Pipeline</h1>
+    <div class="pipeline-visual">
+      <div class="step active">
+        <div class="circle">1</div>
+        <div class="label">Connect</div>
+      </div>
+      <div class="line"></div>
+      <div class="step">
+        <div class="circle">2</div>
+        <div class="label">Configure</div>
+      </div>
+      <div class="line"></div>
+      <div class="step">
+        <div class="circle">3</div>
+        <div class="label">Deploy</div>
+      </div>
+    </div>
+    
+    <div class="content-area">
+      <p>Select a provider to start integration.</p>
+      <div class="card glass">
+        <h3>GitHub</h3>
+        <button id="connect-gh">Connect</button>
+      </div>
+    </div>
+  `;
+
+  // Re-attach connect button listener
+  const newConnectBtn = document.getElementById('connect-gh');
+  if (newConnectBtn) {
+    newConnectBtn.addEventListener('click', () => {
+      newConnectBtn.innerText = 'Connecting...';
+      newConnectBtn.disabled = true;
+
+      setTimeout(() => {
+        newConnectBtn.innerText = 'Connected';
+        newConnectBtn.classList.add('connected-state');
+
+        setTimeout(() => advanceToStep(2), 500);
+      }, 1500);
+    });
+  }
+}
+
+// Wire up Business Pipelines button
+if (bizPipelinesBtn) {
+  bizPipelinesBtn.addEventListener('click', () => {
+    renderBusinessPipelines();
+  });
+}
+
+// Wire up Dashboard button to return to Integration Pipeline
+const dashboardBtn = document.querySelector('.menu-btn[title="Dashboard"]');
+if (dashboardBtn) {
+  dashboardBtn.addEventListener('click', () => {
+    renderIntegrationPipeline();
+  });
+}
