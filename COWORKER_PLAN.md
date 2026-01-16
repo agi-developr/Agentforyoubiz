@@ -110,7 +110,30 @@ function advanceToStep(step) {
 2.  **Deployment Simulation**: Step 3 should show a terminal-like window simulating a build process.
 3.  **Responsiveness**: The sidebar is fixed width (70px). Ensure the `.pipeline-container` wraps correctly on mobile.
 
-## 6. ❓ Troubleshooting
+## 6. 🏆 Hackathon Strategy: Okta + Retool 💎
+**Event**: Build Production-Ready AI Agents
+**Date**: Jan 16
+**Goal**: Build secure, deployable agents.
+
+### Sponsor Alignment Scores & Winning Tactics
+
+#### 1. Okta (Auth0) - 🛡️ Identity & Security
+*   **Alignment Score**: **98%** (Critical Component)
+*   **Why**: AI Agents acting on behalf of users *must* be secure. Identity is the trust layer.
+*   **✅ How to Win**:
+    *   [ ] **Implement "Sign in with Auth0"**: Do not roll your own auth. Use their SDK.
+    *   [ ] **Agent Scopes**: Show how you use Okta to grant specific permissions (scopes) to the agent (e.g., `read:email` but not `delete:account`).
+    *   [ ] **MFA Challenge**: Bonus points if the agent pauses to ask for Human-in-the-Loop approval (via Okta MFA) before doing a sensitive action (like spending money).
+
+#### 2. Retool - ⚙️ Speed & Operations
+*   **Alignment Score**: **92%** (Fast Execution)
+*   **Why**: Retool is about building internal tools *fast*. Our "Configure" step is essentially building a Retool-like interface for agents.
+*   **✅ How to Win**:
+    *   [ ] **Embed/Integration**: If we can't build in Retool, show how our "Deploy" step sends data *to* a Retool workflow.
+    *   [ ] **The "Builder" Aesthetic**: Our UI mimics the speed and clarity of Retool.
+    *   [ ] **Visual Logic**: Make the "Configure" step (Step 2) look like a visual workflow builder (nodes and edges), which Retool users love.
+
+## 7. ❓ Troubleshooting
 *   **"Vite not found"**: Run `npm install`.
 *   **Changes not showing**: Check the terminal. If you edited `index.html`, Vite usually reloads automatically. If not, refresh the page manually.
 *   **CSS broken**: Make sure you are using the CSS variables defined in `:root`.

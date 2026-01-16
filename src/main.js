@@ -13,6 +13,9 @@ document.querySelector('#app').innerHTML = `
       <button class="menu-btn" title="Discover">
         <span class="icon">🔍</span>
       </button>
+      <button id="bizPipelinesBtn" class="menu-btn" title="Business Pipelines">
+        <span class="icon">💼</span>
+      </button>
     </div>
     <div class="menu-bottom">
       <button id="alignmentBtn" class="menu-btn alignment-btn" title="Hackathon Alignment">
@@ -67,17 +70,113 @@ document.querySelector('#app').innerHTML = `
         </div>
 
         <div class="alignment-score-section">
-          <div class="score-label">
-            <span>PROJECT ALIGNMENT SCORE</span>
-            <span class="score-val">98%</span>
+          <!-- Total Score Header -->
+          <div class="total-score-header">
+             <div class="total-label">POTENTIAL PRIZE POOL</div>
+             <div class="total-value">$29,300+</div>
           </div>
-          <div class="progress-track">
-            <div class="progress-fill" style="width: 98%;"></div>
-          </div>
-          <div class="score-details">
-            <p>> <strong>Target:</strong> Build secure, production-ready AI agents.</p>
-            <p>> <strong>Tech Stack:</strong> Okta (Identity) + Retool (UI/Logic).</p>
-            <p>> <strong>Status:</strong> Ready for deployment.</p>
+          
+          <div class="score-grid extended-grid">
+            
+            <!-- Retool (Already Targeted) -->
+            <div class="sponsor-card retool-card active-target">
+              <div class="card-header">
+                <h4>Retool (UI)</h4>
+                <div class="score-badge success">92%</div>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill" style="width: 92%;"></div>
+              </div>
+              <ul class="task-list">
+                <li class="task-item"><input type="checkbox" checked disabled><span>Embed/Integration</span></li>
+                <li class="task-item"><input type="checkbox" checked disabled><span>Builder Aesthetic</span></li>
+              </ul>
+            </div>
+
+            <!-- Yutori (High Value) -->
+            <div class="sponsor-card">
+              <div class="card-header">
+                <h4>Yutori (API)</h4>
+                <div class="score-badge warning">0%</div>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill" style="width: 5%; background: var(--text-muted);"></div>
+              </div>
+              <p class="prize-tag">🏆 $3,500 Prize</p>
+            </div>
+
+            <!-- TinyFish -->
+            <div class="sponsor-card">
+              <div class="card-header">
+                <h4>TinyFish (Web Agent)</h4>
+                <div class="score-badge warning">0%</div>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill" style="width: 5%; background: var(--text-muted);"></div>
+              </div>
+              <p class="prize-tag">🏆 $2,250 Prize</p>
+            </div>
+
+            <!-- Freepik -->
+            <div class="sponsor-card">
+              <div class="card-header">
+                <h4>Freepik (Assets)</h4>
+                <div class="score-badge warning">0%</div>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill" style="width: 5%; background: var(--text-muted);"></div>
+              </div>
+              <p class="prize-tag">🏆 $1,850 Prize</p>
+            </div>
+
+            <!-- Cline -->
+            <div class="sponsor-card">
+              <div class="card-header">
+                <h4>Cline (Innovative)</h4>
+                <div class="score-badge warning">0%</div>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill" style="width: 5%; background: var(--text-muted);"></div>
+              </div>
+              <p class="prize-tag">🏆 $1,500 Prize</p>
+            </div>
+
+            <!-- Tonic Fabricate -->
+            <div class="sponsor-card">
+              <div class="card-header">
+                <h4>Tonic Fabricate</h4>
+                <div class="score-badge warning">0%</div>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill" style="width: 5%; background: var(--text-muted);"></div>
+              </div>
+              <p class="prize-tag">🏆 $1,000 Prize</p>
+            </div>
+
+             <!-- Macroscope -->
+            <div class="sponsor-card">
+              <div class="card-header">
+                <h4>Macroscope</h4>
+                <div class="score-badge warning">0%</div>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill" style="width: 5%; background: var(--text-muted);"></div>
+              </div>
+              <p class="prize-tag">🏆 $1,000 Prize</p>
+            </div>
+
+            <!-- Senso.ai -->
+            <div class="sponsor-card">
+              <div class="card-header">
+                <h4>Senso.ai</h4>
+                <div class="score-badge warning">0%</div>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill" style="width: 5%; background: var(--text-muted);"></div>
+              </div>
+              <p class="prize-tag">🏆 $2k Credits</p>
+            </div>
+
           </div>
         </div>
 
@@ -100,7 +199,21 @@ document.querySelector('#app').innerHTML = `
   </div>
 `
 
-// Modal Logic
+// --- LOGIC ---
+
+// 1. Navigation Logic (Sidebar)
+const navButtons = document.querySelectorAll('.menu-btn');
+navButtons.forEach(btn => {
+  btn.addEventListener('click', () => {
+    // Basic active state toggling
+    if (!btn.classList.contains('alignment-btn')) { // Don't toggle alignment btn as active like a tab
+      navButtons.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    }
+  });
+});
+
+// 2. Modal Logic
 const alignmentBtn = document.getElementById('alignmentBtn');
 const alignmentModal = document.getElementById('alignmentModal');
 const closeModalBtn = document.getElementById('closeModalBtn');
@@ -122,5 +235,108 @@ if (alignmentModal) {
     if (e.target === alignmentModal) {
       alignmentModal.classList.add('hidden');
     }
+  });
+}
+
+// 3. Pipeline & Connect Logic
+const connectBtn = document.getElementById('connect-gh');
+const contentArea = document.querySelector('.content-area');
+const steps = document.querySelectorAll('.step');
+const lines = document.querySelectorAll('.line');
+
+function advanceToStep(stepNumber) {
+  // Update Visuals (Step Indicators)
+  steps.forEach((s, idx) => {
+    if (idx < stepNumber) {
+      s.classList.add('active');
+    } else {
+      s.classList.remove('active');
+    }
+  });
+
+  // Update Lines
+  // line 0 connects step 1 and 2. So if stepNumber is 2, line 0 should be active.
+  lines.forEach((l, idx) => {
+    if (idx < stepNumber - 1) {
+      l.style.opacity = '1';
+      l.style.background = 'var(--primary-color)';
+    }
+  });
+
+  // Update Content Area
+  if (stepNumber === 2) {
+    contentArea.innerHTML = `
+      <div class="card glass animate-slide-up">
+        <h3>Configure Agent</h3>
+        <p class="subtitle">Set permissions and access levels.</p>
+        
+        <div class="form-group margin-top">
+           <label>Agent Name</label>
+           <input type="text" value="MyFirstAgent_v1" class="input-field" />
+        </div>
+
+        <div class="permissions-group">
+           <label>Permissions (Scopes)</label>
+           <div class="checkbox-group">
+             <label><input type="checkbox" checked> read:profile</label>
+             <label><input type="checkbox" checked> read:email</label>
+             <label><input type="checkbox"> write:admin</label>
+           </div>
+        </div>
+
+        <button id="deploy-btn" class="primary-btn">Deploy Agent 🚀</button>
+      </div>
+    `;
+
+    // Wire up the new button (for next step)
+    document.getElementById('deploy-btn').addEventListener('click', () => {
+      advanceToStep(3);
+    });
+  }
+  else if (stepNumber === 3) {
+    contentArea.innerHTML = `
+        <div class="terminal-window animate-slide-up">
+           <div class="terminal-header">
+             <span class="dot red"></span>
+             <span class="dot yellow"></span>
+             <span class="dot green"></span>
+             <span class="title">deploy_logs.txt</span>
+           </div>
+           <div class="terminal-body">
+             <p>> Initializing build environment...</p>
+             <p>> Verifying Auth0 credentials... <span class="green">OK</span></p>
+             <p>> Bundling agent logic... <span class="green">Done</span></p>
+             <p>> Deploying to edge... <span class="blink">_</span></p>
+           </div>
+        </div>
+        <div class="success-message hidden">
+           <h2>🎉 Deployment Successful!</h2>
+        </div>
+     `;
+
+    // Simulate typewriter effect or scrolling logs
+    setTimeout(() => {
+      const body = document.querySelector('.terminal-body');
+      body.innerHTML += `<p>> Live at: <a href="#" class="link">https://agent-xyz.app</a></p>`;
+      document.querySelector('.success-message').classList.remove('hidden');
+    }, 2000);
+  }
+}
+
+if (connectBtn) {
+  connectBtn.addEventListener('click', () => {
+    // 1. Change text to "Connecting..."
+    connectBtn.innerText = 'Connecting...';
+    connectBtn.disabled = true;
+
+    // 2. Simulate API delay
+    setTimeout(() => {
+      // 3. Success State
+      connectBtn.innerText = 'Connected';
+      connectBtn.classList.add('connected-state');
+
+      // 4. Trigger move to next step (Task B)
+      setTimeout(() => advanceToStep(2), 500);
+    }, 1500);
   });
 }
