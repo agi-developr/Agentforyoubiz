@@ -18,6 +18,9 @@ document.querySelector('#app').innerHTML = `
       </button>
     </div>
     <div class="menu-bottom">
+      <button id="hireAgentBtn" class="menu-btn hire-agent-btn" title="Hire Agent">
+        <span class="icon">🤖</span>
+      </button>
       <button id="alignmentBtn" class="menu-btn alignment-btn" title="Hackathon Alignment">
         <span class="icon">💎</span>
       </button>
@@ -195,6 +198,110 @@ document.querySelector('#app').innerHTML = `
       <div class="modal-footer">
            <button class="btn-execute full-width" onclick="window.open('https://lu.ma/event/evt-Q2QYkS6','_blank')">JOIN WAITLIST</button>
       </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AGENT MARKETPLACE MODAL -->
+  <div id="agentMarketplaceModal" class="modal-overlay hidden">
+    <div class="modal-window agent-marketplace-window">
+      <div class="modal-header">
+        <span class="modal-title">🤖 HIRE EXTERNAL AGENTS</span>
+        <button id="closeAgentModalBtn" class="close-btn">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="marketplace-intro">
+          <p>Expand your business capabilities with specialized AI agents. Choose from our marketplace of expert agents.</p>
+        </div>
+
+        <div id="myAgentsList" class="my-agents-section hidden">
+          <h3>My Active Agents</h3>
+          <div class="active-agents-container"></div>
+        </div>
+
+        <h3 class="marketplace-section-title">Available Agents</h3>
+        <div class="agent-grid">
+          
+          <div class="agent-card" data-agent-id="marketing-agent">
+            <div class="agent-icon">💼</div>
+            <h4>Marketing Agent</h4>
+            <div class="agent-price">$500<span>/month</span></div>
+            <ul class="agent-capabilities">
+              <li>Campaign automation</li>
+              <li>SEO optimization</li>
+              <li>Content generation</li>
+              <li>Social media management</li>
+            </ul>
+            <button class="hire-agent-btn" data-agent-name="Marketing Agent" data-agent-price="500">Hire Now</button>
+          </div>
+
+          <div class="agent-card" data-agent-id="sales-agent">
+            <div class="agent-icon">📊</div>
+            <h4>Sales Agent</h4>
+            <div class="agent-price">$750<span>/month</span></div>
+            <ul class="agent-capabilities">
+              <li>Lead qualification</li>
+              <li>CRM automation</li>
+              <li>Follow-up sequences</li>
+              <li>Pipeline management</li>
+            </ul>
+            <button class="hire-agent-btn" data-agent-name="Sales Agent" data-agent-price="750">Hire Now</button>
+          </div>
+
+          <div class="agent-card" data-agent-id="compliance-agent">
+            <div class="agent-icon">⚖️</div>
+            <h4>Compliance Agent</h4>
+            <div class="agent-price">$1,000<span>/month</span></div>
+            <ul class="agent-capabilities">
+              <li>Regulatory checks</li>
+              <li>Documentation</li>
+              <li>Audit trails</li>
+              <li>Risk assessment</li>
+            </ul>
+            <button class="hire-agent-btn" data-agent-name="Compliance Agent" data-agent-price="1000">Hire Now</button>
+          </div>
+
+          <div class="agent-card" data-agent-id="hr-agent">
+            <div class="agent-icon">👥</div>
+            <h4>HR Agent</h4>
+            <div class="agent-price">$600<span>/month</span></div>
+            <ul class="agent-capabilities">
+              <li>Resume screening</li>
+              <li>Interview scheduling</li>
+              <li>Onboarding automation</li>
+              <li>Performance tracking</li>
+            </ul>
+            <button class="hire-agent-btn" data-agent-name="HR Agent" data-agent-price="600">Hire Now</button>
+          </div>
+
+          <div class="agent-card" data-agent-id="data-agent">
+            <div class="agent-icon">📈</div>
+            <h4>Data Analysis Agent</h4>
+            <div class="agent-price">$850<span>/month</span></div>
+            <ul class="agent-capabilities">
+              <li>Custom reports</li>
+              <li>Interactive dashboards</li>
+              <li>Predictive insights</li>
+              <li>Data visualization</li>
+            </ul>
+            <button class="hire-agent-btn" data-agent-name="Data Analysis Agent" data-agent-price="850">Hire Now</button>
+          </div>
+
+          <div class="agent-card" data-agent-id="customer-success-agent">
+            <div class="agent-icon">🤝</div>
+            <h4>Customer Success Agent</h4>
+            <div class="agent-price">$700<span>/month</span></div>
+            <ul class="agent-capabilities">
+              <li>24/7 support responses</li>
+              <li>Customer sentiment analysis</li>
+              <li>Ticket prioritization</li>
+              <li>Retention strategies</li>
+            </ul>
+            <button class="hire-agent-btn" data-agent-name="Customer Success Agent" data-agent-price="700">Hire Now</button>
+          </div>
+
+        </div>
+      </div>
     </div>
   </div>
 `
@@ -236,6 +343,140 @@ if (alignmentModal) {
       alignmentModal.classList.add('hidden');
     }
   });
+}
+
+// 2b. Agent Marketplace Modal Logic
+const hireAgentBtn = document.getElementById('hireAgentBtn');
+const agentMarketplaceModal = document.getElementById('agentMarketplaceModal');
+const closeAgentModalBtn = document.getElementById('closeAgentModalBtn');
+const myAgentsList = document.getElementById('myAgentsList');
+const activeAgentsContainer = document.querySelector('.active-agents-container');
+
+// Store hired agents
+let hiredAgents = [];
+
+if (hireAgentBtn && agentMarketplaceModal) {
+  hireAgentBtn.addEventListener('click', () => {
+    agentMarketplaceModal.classList.remove('hidden');
+  });
+}
+
+if (closeAgentModalBtn && agentMarketplaceModal) {
+  closeAgentModalBtn.addEventListener('click', () => {
+    agentMarketplaceModal.classList.add('hidden');
+  });
+}
+
+if (agentMarketplaceModal) {
+  agentMarketplaceModal.addEventListener('click', (e) => {
+    if (e.target === agentMarketplaceModal) {
+      agentMarketplaceModal.classList.add('hidden');
+    }
+  });
+}
+
+// Handle "Hire Now" button clicks
+document.addEventListener('click', (e) => {
+  if (e.target.classList.contains('hire-agent-btn')) {
+    const agentName = e.target.getAttribute('data-agent-name');
+    const agentPrice = e.target.getAttribute('data-agent-price');
+    const agentCard = e.target.closest('.agent-card');
+    const agentId = agentCard.getAttribute('data-agent-id');
+
+    // Check if already hired
+    if (hiredAgents.some(agent => agent.id === agentId)) {
+      alert(`${agentName} is already hired!`);
+      return;
+    }
+
+    // Confirmation dialog
+    const confirmed = confirm(`Hire ${agentName} for $${agentPrice}/month?\n\nThis agent will be added to your active agents.`);
+
+    if (confirmed) {
+      // Add to hired agents
+      const agent = {
+        id: agentId,
+        name: agentName,
+        price: agentPrice,
+        icon: agentCard.querySelector('.agent-icon').textContent
+      };
+      hiredAgents.push(agent);
+
+      // Update button state
+      e.target.textContent = '✓ Hired';
+      e.target.disabled = true;
+      e.target.style.background = 'rgba(46, 204, 113, 0.3)';
+      e.target.style.borderColor = '#2ecc71';
+      e.target.style.color = '#2ecc71';
+
+      // Update "My Agents" section
+      updateMyAgentsList();
+
+      // Show success message
+      showNotification(`✓ Successfully hired ${agentName}!`);
+    }
+  }
+});
+
+function updateMyAgentsList() {
+  if (hiredAgents.length > 0) {
+    myAgentsList.classList.remove('hidden');
+    activeAgentsContainer.innerHTML = hiredAgents.map(agent => `
+      <div class="hired-agent-item">
+        <div class="hired-agent-icon">${agent.icon}</div>
+        <div class="hired-agent-info">
+          <div class="hired-agent-name">${agent.name}</div>
+          <div class="hired-agent-price">$${agent.price}/month</div>
+        </div>
+        <button class="remove-agent-btn" data-agent-id="${agent.id}">Remove</button>
+      </div>
+    `).join('');
+  } else {
+    myAgentsList.classList.add('hidden');
+  }
+}
+
+// Handle agent removal
+document.addEventListener('click', (e) => {
+  if (e.target.classList.contains('remove-agent-btn')) {
+    const agentId = e.target.getAttribute('data-agent-id');
+    const agent = hiredAgents.find(a => a.id === agentId);
+
+    if (confirm(`Remove ${agent.name} from your active agents?`)) {
+      hiredAgents = hiredAgents.filter(a => a.id !== agentId);
+      updateMyAgentsList();
+
+      // Re-enable the hire button in the marketplace
+      const agentCard = document.querySelector(`[data-agent-id="${agentId}"]`);
+      if (agentCard) {
+        const hireBtn = agentCard.querySelector('.hire-agent-btn');
+        hireBtn.textContent = 'Hire Now';
+        hireBtn.disabled = false;
+        hireBtn.style.background = '';
+        hireBtn.style.borderColor = '';
+        hireBtn.style.color = '';
+      }
+
+      showNotification(`Removed ${agent.name}`);
+    }
+  }
+});
+
+function showNotification(message) {
+  // Create notification element
+  const notification = document.createElement('div');
+  notification.className = 'notification-toast';
+  notification.textContent = message;
+  document.body.appendChild(notification);
+
+  // Trigger animation
+  setTimeout(() => notification.classList.add('show'), 100);
+
+  // Remove after 3 seconds
+  setTimeout(() => {
+    notification.classList.remove('show');
+    setTimeout(() => notification.remove(), 300);
+  }, 3000);
 }
 
 // 3. Pipeline & Connect Logic
