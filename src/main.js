@@ -1,31 +1,41 @@
 import './style.css'
+import './workforce-styles.css'
 
 document.querySelector('#app').innerHTML = `
-  <!-- VERTICAL LEFT MENU -->
+  <!-- Globe Background Visual -->
+  <div class="globe-container">
+    <div class="globe"></div>
+  </div>
+  
+  <!-- Grid Overlay -->
+  <div class="grid-overlay"></div>
+  
+  <!-- VERTICAL LEFT MENU - NUMBERED STEPS -->
   <nav class="left-menubar">
-    <div class="menu-top">
-      <button class="menu-btn active" title="Dashboard">
-        <span class="icon">▣</span>
+    <div class="menu-steps">
+      <button class="step-btn" data-step="0" title="Generate your business idea">
+        <span class="step-number">0</span>
+        <span class="step-label">Idea</span>
       </button>
-      <button class="menu-btn" title="Events">
-        <span class="icon">📅</span>
+      <button class="step-btn" data-step="1" title="Build your business pipeline">
+        <span class="step-number">1</span>
+        <span class="step-label">Pipeline</span>
       </button>
-      <button class="menu-btn" title="Discover">
-        <span class="icon">🔍</span>
+      <button class="step-btn active" data-step="2" title="Connect integrations">
+        <span class="step-number">2</span>
+        <span class="step-label">Connect</span>
       </button>
-      <button id="ideaGeneratorBtn" class="menu-btn" title="Idea Generator">
-        <span class="icon">💡</span>
+      <button class="step-btn" data-step="3" title="Configure settings">
+        <span class="step-number">3</span>
+        <span class="step-label">Configure</span>
       </button>
-      <button id="bizPipelinesBtn" class="menu-btn" title="Business Pipelines">
-        <span class="icon">💼</span>
+      <button class="step-btn" data-step="4" title="Hire AI agents">
+        <span class="step-number">4</span>
+        <span class="step-label">Agents</span>
       </button>
-    </div>
-    <div class="menu-bottom">
-      <button id="hireAgentBtn" class="menu-btn hire-agent-btn" title="Hire Agent">
-        <span class="icon">🤖</span>
-      </button>
-      <button id="alignmentBtn" class="menu-btn alignment-btn" title="Hackathon Alignment">
-        <span class="icon">💎</span>
+      <button class="step-btn" data-step="5" title="Monitor performance">
+        <span class="step-number">5</span>
+        <span class="step-label">Monitor</span>
       </button>
     </div>
   </nav>
@@ -311,28 +321,54 @@ document.querySelector('#app').innerHTML = `
 
 // --- LOGIC ---
 
-// 1. Navigation Logic (Sidebar)
-const navButtons = document.querySelectorAll('.menu-btn');
-navButtons.forEach(btn => {
+// 1. Navigation Logic (Numbered Steps)
+const stepButtons = document.querySelectorAll('.step-btn');
+stepButtons.forEach(btn => {
   btn.addEventListener('click', () => {
-    // Basic active state toggling
-    if (!btn.classList.contains('alignment-btn')) { // Don't toggle alignment btn as active like a tab
-      navButtons.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-    }
+    const step = btn.getAttribute('data-step');
+
+    // Update active state
+    stepButtons.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    // Navigate to corresponding view
+    navigateToStep(step);
   });
 });
 
-// 2. Modal Logic
-const alignmentBtn = document.getElementById('alignmentBtn');
+// Navigation router for numbered steps
+function navigateToStep(step) {
+  switch (step) {
+    case '0':
+      renderIdeaGenerator();
+      break;
+    case '1':
+      renderBusinessPipelines();
+      break;
+    case '2':
+      renderIntegrationPipeline();
+      break;
+    case '3':
+      renderConfigureView();
+      break;
+    case '4':
+      // Open agent marketplace modal
+      if (agentMarketplaceModal) {
+        agentMarketplaceModal.classList.remove('hidden');
+      }
+      break;
+    case '5':
+      renderMonitorView();
+      break;
+    default:
+      renderIntegrationPipeline();
+  }
+}
+
+
+// 2. Modal Logic (Alignment Modal - opened from Step 5)
 const alignmentModal = document.getElementById('alignmentModal');
 const closeModalBtn = document.getElementById('closeModalBtn');
-
-if (alignmentBtn && alignmentModal) {
-  alignmentBtn.addEventListener('click', () => {
-    alignmentModal.classList.remove('hidden');
-  });
-}
 
 if (closeModalBtn && alignmentModal) {
   closeModalBtn.addEventListener('click', () => {
@@ -349,7 +385,6 @@ if (alignmentModal) {
 }
 
 // 2b. Agent Marketplace Modal Logic
-const hireAgentBtn = document.getElementById('hireAgentBtn');
 const agentMarketplaceModal = document.getElementById('agentMarketplaceModal');
 const closeAgentModalBtn = document.getElementById('closeAgentModalBtn');
 const myAgentsList = document.getElementById('myAgentsList');
@@ -358,11 +393,6 @@ const activeAgentsContainer = document.querySelector('.active-agents-container')
 // Store hired agents
 let hiredAgents = [];
 
-if (hireAgentBtn && agentMarketplaceModal) {
-  hireAgentBtn.addEventListener('click', () => {
-    agentMarketplaceModal.classList.remove('hidden');
-  });
-}
 
 if (closeAgentModalBtn && agentMarketplaceModal) {
   closeAgentModalBtn.addEventListener('click', () => {
@@ -698,20 +728,8 @@ function renderIntegrationPipeline() {
   }
 }
 
-// Wire up Business Pipelines button
-if (bizPipelinesBtn) {
-  bizPipelinesBtn.addEventListener('click', () => {
-    renderBusinessPipelines();
-  });
-}
+// Functions render views via navigateToStep() - no individual button wiring needed
 
-// Wire up Dashboard button to return to Integration Pipeline
-const dashboardBtn = document.querySelector('.menu-btn[title="Dashboard"]');
-if (dashboardBtn) {
-  dashboardBtn.addEventListener('click', () => {
-    renderIntegrationPipeline();
-  });
-}
 
 // 5. Idea Generator Feature
 const ideaGeneratorBtn = document.getElementById('ideaGeneratorBtn');
@@ -780,16 +798,22 @@ function generateBusinessPipeline(idea) {
   // Extract business name/product
   const businessName = extractBusinessName(idea);
 
-  // Detect business characteristics
-  const isPhysicalProduct = /\b(sell|product|manufacture|produce|chips|food|goods|items)\b/.test(lowerIdea);
-  const isService = /\b(service|consulting|agency|platform|software|saas)\b/.test(lowerIdea);
-  const isB2B = /\b(b2b|enterprise|business|companies)\b/.test(lowerIdea);
-  const isB2C = /\b(b2c|consumer|customer|people|users)\b/.test(lowerIdea);
-  const isFood = /\b(food|chips|restaurant|cafe|snack|eat|cook|bake)\b/.test(lowerIdea);
-  const isTech = /\b(software|app|platform|saas|tech|digital|ai|ml)\b/.test(lowerIdea);
-  const isHealthcare = /\b(health|medical|healthcare|clinic|doctor|patient)\b/.test(lowerIdea);
+  // Enhanced business model detection
+  const businessModel = detectBusinessModel(lowerIdea);
 
-  // Build process blocks with priorities
+  // Detect business characteristics
+  const isPhysicalProduct = /\b(sell|product|manufacture|produce|chips|food|goods|items|physical|tangible)\b/.test(lowerIdea);
+  const isService = /\b(service|consulting|agency|platform|software|saas)\b/.test(lowerIdea);
+  const isB2B = /\b(b2b|enterprise|business|businesses|companies|corporate)\b/.test(lowerIdea);
+  const isB2C = /\b(b2c|consumer|customer|people|users|individuals)\b/.test(lowerIdea);
+  const isFood = /\b(food|chips|restaurant|cafe|snack|eat|cook|bake|beverage|drink)\b/.test(lowerIdea);
+  const isTech = /\b(software|app|platform|saas|tech|digital|ai|ml|web|mobile)\b/.test(lowerIdea);
+  const isHealthcare = /\b(health|medical|healthcare|clinic|doctor|patient|wellness|fitness)\b/.test(lowerIdea);
+  const isEcommerce = /\b(ecommerce|e-commerce|online store|marketplace|shopping)\b/.test(lowerIdea);
+  const isSaaS = /\b(saas|software as a service|subscription|cloud)\b/.test(lowerIdea);
+  const isMarketplace = /\b(marketplace|platform connects|peer.to.peer|p2p)\b/.test(lowerIdea);
+
+  // Build process blocks with priorities, workforce options, and costs
   const processes = [];
 
   // Marketing - Almost always high priority for new businesses
@@ -808,7 +832,21 @@ function generateBusinessPipeline(idea) {
       'Create brand identity',
       'Launch social media presence',
       'Develop content strategy'
-    ]
+    ],
+    workforceOptions: {
+      recommended: 'hybrid',
+      agentTypes: ['Marketing Agent'],
+      costs: {
+        ai: 500,
+        human: 4500,
+        hybrid: 2500
+      },
+      timeEstimates: {
+        ai: '24/7',
+        human: '40 hrs/week',
+        hybrid: '24/7 + strategy'
+      }
+    }
   });
 
   // Manufacturing - Only for physical products
@@ -826,7 +864,21 @@ function generateBusinessPipeline(idea) {
         'Set up production facility',
         'Establish quality control',
         'Optimize production process'
-      ]
+      ],
+      workforceOptions: {
+        recommended: 'human',
+        agentTypes: [],
+        costs: {
+          ai: 0, // Not automatable
+          human: 8000,
+          hybrid: 8000
+        },
+        timeEstimates: {
+          ai: 'N/A',
+          human: 'Full-time team',
+          hybrid: 'Full-time team'
+        }
+      }
     });
   }
 
@@ -845,7 +897,21 @@ function generateBusinessPipeline(idea) {
         'Build MVP/prototype',
         'Conduct user testing',
         'Iterate based on feedback'
-      ]
+      ],
+      workforceOptions: {
+        recommended: 'hybrid',
+        agentTypes: [],
+        costs: {
+          ai: 0,
+          human: 12000,
+          hybrid: 9000
+        },
+        timeEstimates: {
+          ai: 'N/A',
+          human: '3-6 months',
+          hybrid: '2-4 months'
+        }
+      }
     });
   }
 
@@ -861,7 +927,21 @@ function generateBusinessPipeline(idea) {
       'Set up accounting system',
       'Determine funding needs',
       'Establish pricing strategy'
-    ]
+    ],
+    workforceOptions: {
+      recommended: 'hybrid',
+      agentTypes: ['Data Analysis Agent'],
+      costs: {
+        ai: 850,
+        human: 6000,
+        hybrid: 3500
+      },
+      timeEstimates: {
+        ai: 'Real-time reporting',
+        human: 'Monthly close',
+        hybrid: 'Automated + oversight'
+      }
+    }
   });
 
   // Compliance - Higher for food, healthcare, finance
@@ -886,7 +966,21 @@ function generateBusinessPipeline(idea) {
       'Industry licenses',
       'Legal compliance review',
       'Insurance coverage'
-    ]
+    ],
+    workforceOptions: {
+      recommended: 'human',
+      agentTypes: ['Compliance Agent'],
+      costs: {
+        ai: 1000,
+        human: 7000,
+        hybrid: 4500
+      },
+      timeEstimates: {
+        ai: 'Monitoring only',
+        human: 'Full compliance',
+        hybrid: 'AI monitoring + human expertise'
+      }
+    }
   });
 
   // Sales - Critical for B2B, High for B2C
@@ -908,7 +1002,21 @@ function generateBusinessPipeline(idea) {
       'Create online store',
       'Optimize checkout process',
       'Establish partnerships'
-    ]
+    ],
+    workforceOptions: {
+      recommended: isB2B ? 'human' : 'hybrid',
+      agentTypes: ['Sales Agent'],
+      costs: {
+        ai: 750,
+        human: isB2B ? 10000 : 4000,
+        hybrid: isB2B ? 6000 : 2500
+      },
+      timeEstimates: {
+        ai: 'Lead qualification',
+        human: 'Full sales cycle',
+        hybrid: 'AI leads + human closing'
+      }
+    }
   });
 
   // Customer Success - Higher for services and B2B
@@ -925,7 +1033,21 @@ function generateBusinessPipeline(idea) {
       'Create help documentation',
       'Implement feedback loops',
       'Build customer community'
-    ]
+    ],
+    workforceOptions: {
+      recommended: 'hybrid',
+      agentTypes: ['Customer Success Agent'],
+      costs: {
+        ai: 700,
+        human: 5000,
+        hybrid: 2800
+      },
+      timeEstimates: {
+        ai: '24/7 support',
+        human: 'Business hours',
+        hybrid: '24/7 AI + human escalation'
+      }
+    }
   });
 
   // Operations
@@ -940,7 +1062,21 @@ function generateBusinessPipeline(idea) {
       'Set up infrastructure',
       'Optimize workflows',
       'Implement automation'
-    ]
+    ],
+    workforceOptions: {
+      recommended: 'hybrid',
+      agentTypes: [],
+      costs: {
+        ai: 0,
+        human: 6000,
+        hybrid: 4000
+      },
+      timeEstimates: {
+        ai: 'Automation only',
+        human: 'Full operations',
+        hybrid: 'Automated + oversight'
+      }
+    }
   });
 
   // HR - Lower priority initially
@@ -955,7 +1091,21 @@ function generateBusinessPipeline(idea) {
       'Create job descriptions',
       'Establish hiring process',
       'Develop onboarding program'
-    ]
+    ],
+    workforceOptions: {
+      recommended: 'hybrid',
+      agentTypes: ['HR Agent'],
+      costs: {
+        ai: 600,
+        human: 5500,
+        hybrid: 3000
+      },
+      timeEstimates: {
+        ai: 'Resume screening',
+        human: 'Full HR function',
+        hybrid: 'AI screening + human interviews'
+      }
+    }
   });
 
   // Sort by priority
@@ -964,9 +1114,29 @@ function generateBusinessPipeline(idea) {
 
   return {
     businessName,
+    businessModel,
     originalIdea: idea,
     processes
   };
+}
+
+// New function: Detect business model
+function detectBusinessModel(lowerIdea) {
+  if (/\b(saas|software as a service|subscription|cloud.based)\b/.test(lowerIdea)) {
+    return 'SaaS';
+  } else if (/\b(marketplace|platform connects|peer.to.peer|p2p)\b/.test(lowerIdea)) {
+    return 'Marketplace';
+  } else if (/\b(ecommerce|e-commerce|online store|dropship)\b/.test(lowerIdea)) {
+    return 'E-commerce';
+  } else if (/\b(agency|consulting|service provider)\b/.test(lowerIdea)) {
+    return 'Service';
+  } else if (/\b(manufacture|produce|physical product|retail)\b/.test(lowerIdea)) {
+    return 'Product';
+  } else if (/\b(franchise|license)\b/.test(lowerIdea)) {
+    return 'Franchise';
+  } else {
+    return 'General Business';
+  }
 }
 
 function extractBusinessName(idea) {
@@ -979,6 +1149,10 @@ function extractBusinessName(idea) {
   // Fallback: use first few words
   return idea.split(' ').slice(0, 6).join(' ') + '...';
 }
+
+// Global state for workforce selections
+let workforceSelections = {};
+let totalMonthlyCost = 0;
 
 function renderGeneratedPipeline(pipeline, container) {
   const priorityEmojis = {
@@ -995,15 +1169,49 @@ function renderGeneratedPipeline(pipeline, container) {
     low: 'LOW'
   };
 
+  // Initialize workforce selections with recommended options
+  workforceSelections = {};
+  pipeline.processes.forEach((process, idx) => {
+    workforceSelections[idx] = process.workforceOptions.recommended;
+  });
+
+  // Calculate initial total cost
+  calculateTotalCost(pipeline);
+
   container.innerHTML = `
     <div class="pipeline-header">
       <h2>Your Customized Business Pipeline</h2>
       <p class="pipeline-subtitle">"${pipeline.businessName}"</p>
+      <div class="business-model-badge">Business Model: ${pipeline.businessModel}</div>
+    </div>
+    
+    <!-- Total Cost Widget -->
+    <div class="total-cost-widget">
+      <div class="cost-widget-header">
+        <h3>💰 Total Monthly Cost</h3>
+        <div class="cost-widget-value" id="totalCostDisplay">$${totalMonthlyCost.toLocaleString()}</div>
+      </div>
+      <div class="cost-breakdown">
+        <div class="cost-breakdown-item">
+          <span>AI Agents:</span>
+          <span id="aiCostCount">calculating...</span>
+        </div>
+        <div class="cost-breakdown-item">
+          <span>Human Staff:</span>
+          <span id="humanCostCount">calculating...</span>
+        </div>
+        <div class="cost-breakdown-item">
+          <span>Hybrid:</span>
+          <span id="hybridCostCount">calculating...</span>
+        </div>
+      </div>
     </div>
     
     <div class="process-blocks">
       ${pipeline.processes.map((process, index) => `
-        <div class="process-block priority-${process.priority}" style="animation-delay: ${index * 0.1}s">
+        <div class="process-block priority-${process.priority} workforce-${workforceSelections[index]}" 
+             style="animation-delay: ${index * 0.1}s" 
+             data-process-index="${index}">
           <div class="process-header">
             <div class="process-title">
               <span class="process-icon">${process.icon}</span>
@@ -1024,6 +1232,53 @@ function renderGeneratedPipeline(pipeline, container) {
             <span>Timeline: ${process.timeline}</span>
           </div>
           
+          <!-- Workforce Selection -->
+          <div class="workforce-selector">
+            <label class="workforce-label">Choose Workforce Type:</label>
+            <div class="workforce-options">
+              <button class="workforce-option ai ${workforceSelections[index] === 'ai' ? 'active' : ''}" 
+                      data-process="${index}" 
+                      data-type="ai"
+                      ${process.workforceOptions.costs.ai === 0 ? 'disabled' : ''}>
+                <span class="workforce-icon">🤖</span>
+                <span class="workforce-name">AI Agent</span>
+                <span class="workforce-cost">$${process.workforceOptions.costs.ai}/mo</span>
+                <span class="workforce-time">${process.workforceOptions.timeEstimates.ai}</span>
+              </button>
+              
+              <button class="workforce-option human ${workforceSelections[index] === 'human' ? 'active' : ''}" 
+                      data-process="${index}" 
+                      data-type="human">
+                <span class="workforce-icon">👤</span>
+                <span class="workforce-name">Human</span>
+                <span class="workforce-cost">$${process.workforceOptions.costs.human}/mo</span>
+                <span class="workforce-time">${process.workforceOptions.timeEstimates.human}</span>
+              </button>
+              
+              <button class="workforce-option hybrid ${workforceSelections[index] === 'hybrid' ? 'active' : ''}" 
+                      data-process="${index}" 
+                      data-type="hybrid"
+                      ${process.workforceOptions.costs.hybrid === process.workforceOptions.costs.human ? 'disabled' : ''}>
+                <span class="workforce-icon">🤝</span>
+                <span class="workforce-name">Hybrid</span>
+                <span class="workforce-cost">$${process.workforceOptions.costs.hybrid}/mo</span>
+                <span class="workforce-time">${process.workforceOptions.timeEstimates.hybrid}</span>
+              </button>
+            </div>
+            
+            ${process.workforceOptions.agentTypes.length > 0 ? `
+              <div class="agent-matches">
+                <span class="agent-matches-label">Recommended Agents:</span>
+                ${process.workforceOptions.agentTypes.map(agentType => `
+                  <span class="agent-match-badge">${agentType}</span>
+                `).join('')}
+                <button class="quick-hire-btn" data-agent-type="${process.workforceOptions.agentTypes[0]}">
+                  Hire Now →
+                </button>
+              </div>
+            ` : ''}
+          </div>
+          
           <div class="process-tasks">
             <strong>Key Tasks:</strong>
             <ul>
@@ -1042,6 +1297,116 @@ function renderGeneratedPipeline(pipeline, container) {
   `;
 
   container.classList.remove('hidden');
+
+  // Store pipeline for reference
+  window.currentPipeline = pipeline;
+
+  // Update cost breakdown
+  updateCostBreakdown(pipeline);
+
+  // Attach workforce selection listeners
+  attachWorkforceListeners(pipeline);
+}
+
+function calculateTotalCost(pipeline) {
+  totalMonthlyCost = 0;
+  pipeline.processes.forEach((process, idx) => {
+    const selection = workforceSelections[idx];
+    totalMonthlyCost += process.workforceOptions.costs[selection] || 0;
+  });
+  return totalMonthlyCost;
+}
+
+function updateCostBreakdown(pipeline) {
+  let aiCount = 0, humanCount = 0, hybridCount = 0;
+  let aiCost = 0, humanCost = 0, hybridCost = 0;
+
+  pipeline.processes.forEach((process, idx) => {
+    const selection = workforceSelections[idx];
+    const cost = process.workforceOptions.costs[selection] || 0;
+
+    if (selection === 'ai') {
+      aiCount++;
+      aiCost += cost;
+    } else if (selection === 'human') {
+      humanCount++;
+      humanCost += cost;
+    } else if (selection === 'hybrid') {
+      hybridCount++;
+      hybridCost += cost;
+    }
+  });
+
+  const aiCostEl = document.getElementById('aiCostCount');
+  const humanCostEl = document.getElementById('humanCostCount');
+  const hybridCostEl = document.getElementById('hybridCostCount');
+
+  if (aiCostEl) aiCostEl.textContent = `${aiCount} processes ($${aiCost.toLocaleString()})`;
+  if (humanCostEl) humanCostEl.textContent = `${humanCount} processes ($${humanCost.toLocaleString()})`;
+  if (hybridCostEl) hybridCostEl.textContent = `${hybridCount} processes ($${hybridCost.toLocaleString()})`;
+}
+
+function attachWorkforceListeners(pipeline) {
+  // Workforce option buttons
+  document.querySelectorAll('.workforce-option').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const button = e.currentTarget;
+      if (button.disabled) return;
+
+      const processIndex = parseInt(button.getAttribute('data-process'));
+      const workforceType = button.getAttribute('data-type');
+
+      // Update selection
+      workforceSelections[processIndex] = workforceType;
+
+      // Update UI - remove active from siblings
+      const parent = button.parentElement;
+      parent.querySelectorAll('.workforce-option').forEach(b => b.classList.remove('active'));
+      button.classList.add('active');
+
+      // Update process block class
+      const processBlock = document.querySelector(`[data-process-index="${processIndex}"]`);
+      processBlock.className = processBlock.className.replace(/workforce-\w+/, `workforce-${workforceType}`);
+
+      // Recalculate costs
+      calculateTotalCost(pipeline);
+      document.getElementById('totalCostDisplay').textContent = `$${totalMonthlyCost.toLocaleString()}`;
+      updateCostBreakdown(pipeline);
+
+      // Animate cost update
+      const costDisplay = document.getElementById('totalCostDisplay');
+      costDisplay.style.transform = 'scale(1.1)';
+      setTimeout(() => costDisplay.style.transform = 'scale(1)', 200);
+    });
+  });
+
+  // Quick hire buttons
+  document.querySelectorAll('.quick-hire-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const agentType = btn.getAttribute('data-agent-type');
+
+      // Open agent marketplace modal
+      const agentMarketplaceModal = document.getElementById('agentMarketplaceModal');
+      if (agentMarketplaceModal) {
+        agentMarketplaceModal.classList.remove('hidden');
+
+        // Scroll to the specific agent card
+        setTimeout(() => {
+          const agentCards = document.querySelectorAll('.agent-card h4');
+          agentCards.forEach(card => {
+            if (card.textContent === agentType) {
+              card.closest('.agent-card').scrollIntoView({ behavior: 'smooth', block: 'center' });
+              card.closest('.agent-card').style.border = '2px solid var(--accent-color)';
+              setTimeout(() => {
+                card.closest('.agent-card').style.border = '';
+              }, 2000);
+            }
+          });
+        }, 300);
+      }
+    });
+  });
 }
 
 // Wire up Idea Generator button
@@ -1049,4 +1414,154 @@ if (ideaGeneratorBtn) {
   ideaGeneratorBtn.addEventListener('click', () => {
     renderIdeaGenerator();
   });
+}
+
+
+// 6. Step 3: Configure View
+function renderConfigureView() {
+    pipelineContainer.innerHTML = `
+    <div class="configure-container fade-in">
+      <h1 class="title">⚙️ Configure Your Business</h1>
+      <p class="subtitle">Set up your business parameters and integrations</p>
+      
+      <div class="config-grid">
+        <div class="config-card card glass">
+          <h3>Business Information</h3>
+          <div class="form-group">
+            <label>Business Name</label>
+            <input type="text" class="input-field" placeholder="Enter business name" />
+          </div>
+          <div class="form-group">
+            <label>Industry</label>
+            <select class="input-field">
+              <option>Select industry</option>
+              <option>Technology</option>
+              <option>Food & Beverage</option>
+              <option>Healthcare</option>
+              <option>E-commerce</option>
+              <option>Other</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="config-card card glass">
+          <h3>API Keys</h3>
+          <div class="form-group">
+            <label>OpenAI API Key</label>
+            <input type="password" class="input-field" placeholder="sk-..." />
+          </div>
+          <div class="form-group">
+            <label>Stripe API Key</label>
+            <input type="password" class="input-field" placeholder="pk_..." />
+          </div>
+        </div>
+
+        <div class="config-card card glass">
+          <h3>Permissions</h3>
+          <div class="checkbox-group">
+            <label><input type="checkbox" checked> Enable AI Automation</label>
+            <label><input type="checkbox" checked> Allow External Integrations</label>
+            <label><input type="checkbox"> Auto-hire Recommended Agents</label>
+            <label><input type="checkbox"> Send Weekly Reports</label>
+          </div>
+        </div>
+
+        <div class="config-card card glass">
+          <h3>Notifications</h3>
+          <div class="form-group">
+            <label>Email Notifications</label>
+            <input type="email" class="input-field" placeholder="your@email.com" />
+          </div>
+          <div class="checkbox-group">
+            <label><input type="checkbox" checked> Agent Status Updates</label>
+            <label><input type="checkbox" checked> Revenue Milestones</label>
+            <label><input type="checkbox"> Daily Summaries</label>
+          </div>
+        </div>
+      </div>
+
+      <button class="primary-btn save-config-btn" style="margin-top: 2rem;">Save Configuration</button>
+    </div>
+  `;
+
+    // Add save handler
+    const saveBtn = document.querySelector('.save-config-btn');
+    if (saveBtn) {
+        saveBtn.addEventListener('click', () => {
+            showNotification('✓ Configuration saved successfully!');
+        });
+    }
+}
+
+// 7. Step 5: Monitor View
+function renderMonitorView() {
+    pipelineContainer.innerHTML = `
+    <div class="monitor-container fade-in">
+      <h1 class="title">📊 Monitor Performance</h1>
+      <p class="subtitle">Track your business metrics and agent performance</p>
+      
+      <div class="metrics-grid">
+        <div class="metric-card card glass">
+          <div class="metric-icon">💰</div>
+          <div class="metric-label">Revenue</div>
+          <div class="metric-value">$12,450</div>
+          <div class="metric-change positive">+23% this month</div>
+        </div>
+
+        <div class="metric-card card glass">
+          <div class="metric-icon">👥</div>
+          <div class="metric-label">Active Agents</div>
+          <div class="metric-value">${hiredAgents.length}</div>
+          <div class="metric-change">${hiredAgents.length > 0 ? 'Working' : 'Hire agents to start'}</div>
+        </div>
+
+        <div class="metric-card card glass">
+          <div class="metric-icon">⚡</div>
+          <div class="metric-label">Automation Rate</div>
+          <div class="metric-value">67%</div>
+          <div class="metric-change positive">+12% this week</div>
+        </div>
+
+        <div class="metric-card card glass">
+          <div class="metric-icon">🎯</div>
+          <div class="metric-label">Goals Completed</div>
+          <div class="metric-value">8/12</div>
+          <div class="metric-change">4 remaining</div>
+        </div>
+      </div>
+
+      <div class="performance-section">
+        <h2>Agent Performance</h2>
+        <div class="agent-performance-list">
+          ${hiredAgents.length > 0 ? hiredAgents.map(agent => `
+            <div class="performance-item card glass">
+              <div class="perf-header">
+                <span class="perf-icon">${agent.icon}</span>
+                <span class="perf-name">${agent.name}</span>
+                <span class="perf-status active">Active</span>
+              </div>
+              <div class="perf-metrics">
+                <div class="perf-metric">
+                  <span class="perf-metric-label">Tasks Completed</span>
+                  <span class="perf-metric-value">${Math.floor(Math.random() * 50 + 20)}</span>
+                </div>
+                <div class="perf-metric">
+                  <span class="perf-metric-label">Efficiency</span>
+                  <span class="perf-metric-value">${Math.floor(Math.random() * 30 + 70)}%</span>
+                </div>
+                <div class="perf-metric">
+                  <span class="perf-metric-label">Cost Savings</span>
+                  <span class="perf-metric-value">$${Math.floor(Math.random() * 3000 + 1000)}</span>
+                </div>
+              </div>
+            </div>
+          `).join('') : '<p class="no-agents-message">No agents hired yet. Go to Step 4 to hire agents!</p>'}
+        </div>
+      </div>
+
+      <button class="primary-btn" onclick="document.getElementById('alignmentModal').classList.remove('hidden')" style="margin-top: 2rem;">
+        View Hackathon Alignment
+      </button>
+    </div>
+  `;
 }
