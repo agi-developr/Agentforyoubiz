@@ -13,6 +13,9 @@ document.querySelector('#app').innerHTML = `
       <button class="menu-btn" title="Discover">
         <span class="icon">🔍</span>
       </button>
+      <button id="ideaGeneratorBtn" class="menu-btn" title="Idea Generator">
+        <span class="icon">💡</span>
+      </button>
       <button id="bizPipelinesBtn" class="menu-btn" title="Business Pipelines">
         <span class="icon">💼</span>
       </button>
@@ -707,5 +710,343 @@ const dashboardBtn = document.querySelector('.menu-btn[title="Dashboard"]');
 if (dashboardBtn) {
   dashboardBtn.addEventListener('click', () => {
     renderIntegrationPipeline();
+  });
+}
+
+// 5. Idea Generator Feature
+const ideaGeneratorBtn = document.getElementById('ideaGeneratorBtn');
+
+function renderIdeaGenerator() {
+  pipelineContainer.innerHTML = `
+    <div class="idea-generator-container fade-in">
+      <h1 class="title">💡 Business Idea Generator</h1>
+      <p class="subtitle">Describe your business idea and we'll create a customized pipeline for you</p>
+      
+      <div class="idea-input-card card glass">
+        <label for="bizIdeaInput" class="idea-label">What's your business idea?</label>
+        <textarea 
+          id="bizIdeaInput" 
+          class="biz-idea-input" 
+          placeholder="Example: I want to create a company to sell chips with purple plantains (similar to bananas)"
+          rows="6"
+        ></textarea>
+        
+        <button id="generatePipelineBtn" class="generate-btn primary-btn">
+          Generate Pipeline 🚀
+        </button>
+      </div>
+      
+      <div id="pipelineResults" class="pipeline-results hidden"></div>
+    </div>
+  `;
+
+  // Wire up generate button
+  const generateBtn = document.getElementById('generatePipelineBtn');
+  const ideaInput = document.getElementById('bizIdeaInput');
+  const resultsContainer = document.getElementById('pipelineResults');
+
+  if (generateBtn && ideaInput) {
+    generateBtn.addEventListener('click', () => {
+      const idea = ideaInput.value.trim();
+
+      if (!idea) {
+        alert('Please enter your business idea first!');
+        return;
+      }
+
+      // Show loading state
+      generateBtn.disabled = true;
+      generateBtn.textContent = 'Analyzing... 🤔';
+
+      // Simulate AI processing delay
+      setTimeout(() => {
+        const pipeline = generateBusinessPipeline(idea);
+        renderGeneratedPipeline(pipeline, resultsContainer);
+
+        // Reset button
+        generateBtn.disabled = false;
+        generateBtn.innerHTML = 'Generate Pipeline 🚀';
+
+        // Scroll to results
+        resultsContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 1500);
+    });
+  }
+}
+
+function generateBusinessPipeline(idea) {
+  const lowerIdea = idea.toLowerCase();
+
+  // Extract business name/product
+  const businessName = extractBusinessName(idea);
+
+  // Detect business characteristics
+  const isPhysicalProduct = /\b(sell|product|manufacture|produce|chips|food|goods|items)\b/.test(lowerIdea);
+  const isService = /\b(service|consulting|agency|platform|software|saas)\b/.test(lowerIdea);
+  const isB2B = /\b(b2b|enterprise|business|companies)\b/.test(lowerIdea);
+  const isB2C = /\b(b2c|consumer|customer|people|users)\b/.test(lowerIdea);
+  const isFood = /\b(food|chips|restaurant|cafe|snack|eat|cook|bake)\b/.test(lowerIdea);
+  const isTech = /\b(software|app|platform|saas|tech|digital|ai|ml)\b/.test(lowerIdea);
+  const isHealthcare = /\b(health|medical|healthcare|clinic|doctor|patient)\b/.test(lowerIdea);
+
+  // Build process blocks with priorities
+  const processes = [];
+
+  // Marketing - Almost always high priority for new businesses
+  processes.push({
+    name: 'Marketing',
+    icon: '📈',
+    priority: (isB2C || isPhysicalProduct) ? 'critical' : 'high',
+    recommendation: isPhysicalProduct
+      ? 'Build brand awareness for your unique product through social media and content marketing'
+      : isTech
+        ? 'Focus on digital marketing, SEO, and community building'
+        : 'Develop a comprehensive marketing strategy to reach your target audience',
+    timeline: 'Month 1',
+    tasks: [
+      'Define target audience',
+      'Create brand identity',
+      'Launch social media presence',
+      'Develop content strategy'
+    ]
+  });
+
+  // Manufacturing - Only for physical products
+  if (isPhysicalProduct) {
+    processes.push({
+      name: 'Manufacturing',
+      icon: '🏭',
+      priority: 'critical',
+      recommendation: isFood
+        ? 'Source ingredients, establish production process, and ensure quality control'
+        : 'Set up supply chain, production line, and quality assurance systems',
+      timeline: 'Month 1-2',
+      tasks: [
+        'Source raw materials/ingredients',
+        'Set up production facility',
+        'Establish quality control',
+        'Optimize production process'
+      ]
+    });
+  }
+
+  // Product Development - For tech/services
+  if (isTech || isService) {
+    processes.push({
+      name: 'Product',
+      icon: '🎨',
+      priority: 'critical',
+      recommendation: isTech
+        ? 'Build MVP, iterate based on user feedback, and maintain product roadmap'
+        : 'Design service offering, create processes, and document best practices',
+      timeline: 'Month 1-3',
+      tasks: [
+        'Define product requirements',
+        'Build MVP/prototype',
+        'Conduct user testing',
+        'Iterate based on feedback'
+      ]
+    });
+  }
+
+  // Finance - Always critical
+  processes.push({
+    name: 'Finance',
+    icon: '💰',
+    priority: 'critical',
+    recommendation: 'Set up accounting systems, forecast cash flow, and plan funding strategy',
+    timeline: 'Month 1',
+    tasks: [
+      'Create financial projections',
+      'Set up accounting system',
+      'Determine funding needs',
+      'Establish pricing strategy'
+    ]
+  });
+
+  // Compliance - Higher for food, healthcare, finance
+  const compliancePriority = (isFood || isHealthcare) ? 'critical' : isPhysicalProduct ? 'high' : 'medium';
+  processes.push({
+    name: 'Compliance',
+    icon: '⚖️',
+    priority: compliancePriority,
+    recommendation: isFood
+      ? 'Obtain FDA approval, food safety certifications, and ensure labeling compliance'
+      : isHealthcare
+        ? 'Ensure HIPAA compliance, obtain necessary licenses, and follow regulations'
+        : 'Research industry regulations, obtain business licenses, and ensure legal compliance',
+    timeline: compliancePriority === 'critical' ? 'Month 1-2' : 'Month 2-3',
+    tasks: isFood ? [
+      'FDA registration',
+      'Food safety certifications',
+      'Labeling compliance',
+      'Health department approvals'
+    ] : [
+      'Business registration',
+      'Industry licenses',
+      'Legal compliance review',
+      'Insurance coverage'
+    ]
+  });
+
+  // Sales - Critical for B2B, High for B2C
+  processes.push({
+    name: 'Sales',
+    icon: '💼',
+    priority: isB2B ? 'critical' : 'high',
+    recommendation: isB2B
+      ? 'Build sales team, develop enterprise sales process, and create pipeline strategy'
+      : 'Set up e-commerce platform, optimize conversion funnel, and establish sales channels',
+    timeline: 'Month 2-3',
+    tasks: isB2B ? [
+      'Develop sales process',
+      'Build sales team',
+      'Create sales collateral',
+      'Establish CRM system'
+    ] : [
+      'Set up sales channels',
+      'Create online store',
+      'Optimize checkout process',
+      'Establish partnerships'
+    ]
+  });
+
+  // Customer Success - Higher for services and B2B
+  processes.push({
+    name: 'Customer Success',
+    icon: '🤝',
+    priority: (isService || isB2B) ? 'high' : 'medium',
+    recommendation: isB2B
+      ? 'Build customer success team, create onboarding process, and track customer health'
+      : 'Provide excellent customer support, gather feedback, and build loyalty programs',
+    timeline: 'Month 3-4',
+    tasks: [
+      'Set up support system',
+      'Create help documentation',
+      'Implement feedback loops',
+      'Build customer community'
+    ]
+  });
+
+  // Operations
+  processes.push({
+    name: 'Operations',
+    icon: '⚙️',
+    priority: isPhysicalProduct ? 'high' : 'medium',
+    recommendation: 'Establish efficient processes, manage logistics, and optimize workflows',
+    timeline: 'Month 3-5',
+    tasks: [
+      'Define operational processes',
+      'Set up infrastructure',
+      'Optimize workflows',
+      'Implement automation'
+    ]
+  });
+
+  // HR - Lower priority initially
+  processes.push({
+    name: 'HR',
+    icon: '👥',
+    priority: isB2B ? 'medium' : 'low',
+    recommendation: 'Plan hiring strategy, create onboarding process, and build company culture',
+    timeline: 'Month 4-6',
+    tasks: [
+      'Define hiring needs',
+      'Create job descriptions',
+      'Establish hiring process',
+      'Develop onboarding program'
+    ]
+  });
+
+  // Sort by priority
+  const priorityOrder = { critical: 0, high: 1, medium: 2, low: 3 };
+  processes.sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]);
+
+  return {
+    businessName,
+    originalIdea: idea,
+    processes
+  };
+}
+
+function extractBusinessName(idea) {
+  // Simple extraction - look for keywords
+  const match = idea.match(/(?:company|business|platform|service|agency)\s+(?:to|for)?\s*(.+?)(?:\.|$)/i);
+  if (match) {
+    return match[1].trim().split(' ').slice(0, 5).join(' ');
+  }
+
+  // Fallback: use first few words
+  return idea.split(' ').slice(0, 6).join(' ') + '...';
+}
+
+function renderGeneratedPipeline(pipeline, container) {
+  const priorityEmojis = {
+    critical: '🔴',
+    high: '🟡',
+    medium: '🟠',
+    low: '⚪'
+  };
+
+  const priorityLabels = {
+    critical: 'CRITICAL',
+    high: 'HIGH',
+    medium: 'MEDIUM',
+    low: 'LOW'
+  };
+
+  container.innerHTML = `
+    <div class="pipeline-header">
+      <h2>Your Customized Business Pipeline</h2>
+      <p class="pipeline-subtitle">"${pipeline.businessName}"</p>
+    </div>
+    
+    <div class="process-blocks">
+      ${pipeline.processes.map((process, index) => `
+        <div class="process-block priority-${process.priority}" style="animation-delay: ${index * 0.1}s">
+          <div class="process-header">
+            <div class="process-title">
+              <span class="process-icon">${process.icon}</span>
+              <h3>${process.name}</h3>
+            </div>
+            <div class="priority-badge priority-${process.priority}">
+              ${priorityEmojis[process.priority]} ${priorityLabels[process.priority]}
+            </div>
+          </div>
+          
+          <div class="ai-recommendation">
+            <strong>AI Recommendation:</strong>
+            <p>${process.recommendation}</p>
+          </div>
+          
+          <div class="timeline-info">
+            <span class="timeline-icon">📅</span>
+            <span>Timeline: ${process.timeline}</span>
+          </div>
+          
+          <div class="process-tasks">
+            <strong>Key Tasks:</strong>
+            <ul>
+              ${process.tasks.map(task => `<li>${task}</li>`).join('')}
+            </ul>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+    
+    <div class="pipeline-actions">
+      <button class="primary-btn" onclick="document.getElementById('bizIdeaInput').scrollIntoView({ behavior: 'smooth' })">
+        Try Another Idea
+      </button>
+    </div>
+  `;
+
+  container.classList.remove('hidden');
+}
+
+// Wire up Idea Generator button
+if (ideaGeneratorBtn) {
+  ideaGeneratorBtn.addEventListener('click', () => {
+    renderIdeaGenerator();
   });
 }
